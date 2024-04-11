@@ -35,4 +35,5 @@ CountryList.propTypes = {
       id: PropTypes.string.isRequired,
     })
   ),
+  isLoading: PropTypes.bool.isRequired,
 };

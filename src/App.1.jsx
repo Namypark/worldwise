@@ -9,7 +9,7 @@ import CityList from "./component/CityList";
 import Product from "./pages/Product";
 import City from "./component/City";
 import CountryList from "./component/CountryList";
-import Form from "./component/Form";
+
 export default function App() {
   const [cities, setCities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +58,7 @@ export default function App() {
             path="countries"
             element={<CountryList countries={cities} isLoading={isLoading} />}
           />
+          <Route path="form" element={<p>Form component</p>} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
