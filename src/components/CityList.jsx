@@ -3,7 +3,11 @@ import CityItem from "./CityItem";
 import PropTypes from "prop-types";
 import Spinner from "./Spinner";
 import Message from "./Message";
-export default function CityList({ cities, isLoading, setCities }) {
+import useCities from "../contexts/useCities";
+
+export default function CityList() {
+  const { cities, isLoading, setCities } = useCities();
+
   if (isLoading) return <Spinner />;
   if (!cities.length)
     return (
@@ -34,6 +38,6 @@ CityList.propTypes = {
       id: PropTypes.string.isRequired,
     })
   ),
-  isLoading: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool,
   setCities: PropTypes.func,
 };

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import styles from "./CityItem.module.css";
 import { Link } from "react-router-dom";
-
+import useCities from "../contexts/useCities";
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
     day: "numeric",
@@ -10,17 +10,23 @@ const formatDate = (date) =>
     weekday: "short",
   }).format(new Date(date));
 
-export default function CityItem({ city, cities, setCities }) {
+export default function CityItem({ city }) {
+  const { cities, setCities, currentCity } = useCities();
+
   const handleDelete = (cityId) => {
     const updatedCities = cities.filter((city) => city.id !== cityId);
     setCities(updatedCities);
   };
   const { emoji, cityName, date, id, position } = city;
-  console.log(position);
+
+  const activeCity = currentCity.id === id;
+
   return (
     <li>
       <Link
-        className={styles.cityItem}
+        className={`${styles.cityItem} ${
+          activeCity ? styles["cityItem--active"] : ""
+        }`}
         to={`${id}?lat=${position.lat}&lon=${position.lng}`}
       >
         <span className={styles.emoji}>{emoji}</span>
