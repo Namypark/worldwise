@@ -15,7 +15,6 @@ import Button from "./Button";
 
 export default function Map() {
   const [position, setPosition] = useState(null);
-  const [Currentposition, setCurrentPosition] = useState(null);
   const { cities } = useCities();
   const {
     isLoading: isLoadingPosition,
@@ -41,9 +40,10 @@ export default function Map() {
       setPosition([parseFloat(lat), parseFloat(lon)]);
     }
   }, [lat, lon]);
+
   useEffect(() => {
     if (geolocationPosition) {
-      setPosition([geolocationPosition.lat, geolocationPosition.lng]);
+      setPosition(geolocationPosition);
     }
   }, [geolocationPosition]);
   return (
@@ -63,7 +63,7 @@ export default function Map() {
           <ChangeCenter position={position} />
           <Marker position={position}>
             <Popup>
-              <span>your position</span>
+              <span>you are here</span>
             </Popup>
           </Marker>
           {cities.map((city) => (
