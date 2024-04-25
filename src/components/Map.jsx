@@ -10,10 +10,19 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import useCities from "../contexts/useCities";
+import useGeoLocation from "../hooks/useGeolocation";
+import Button from "./Button";
 
 export default function Map() {
   const [position, setPosition] = useState(null);
+  const [Currentposition, setCurrentPosition] = useState(null);
   const { cities } = useCities();
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    error: errorPosition,
+    getPosition: getPosition,
+  } = useGeoLocation();
   //Effect to retrieve latitude and longitude from URL and store
   //locally to avoid errors after a refresh is made on the site which resets
 
@@ -32,7 +41,11 @@ export default function Map() {
       setPosition([parseFloat(lat), parseFloat(lon)]);
     }
   }, [lat, lon]);
-
+  useEffect(() => {
+    if (geolocationPosition) {
+      setPosition([geolocationPosition.lat, geolocationPosition.lng]);
+    }
+  }, [geolocationPosition]);
   return (
     <button className={styles.mapContainer}>
       {position ? (
@@ -47,6 +60,12 @@ export default function Map() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <ChangeCenter position={position} />
+          <Marker position={position}>
+            <Popup>
+              <span>your position</span>
+            </Popup>
+          </Marker>
           {cities.map((city) => (
             <Marker
               position={[city.position.lat, city.position.lng]}
@@ -61,7 +80,9 @@ export default function Map() {
           <DetectClicks position={position} />
         </MapContainer>
       ) : (
-        <p>hi</p>
+        <Button onClick={getPosition} type="position">
+          here
+        </Button>
       )}
     </button>
   );
@@ -82,4 +103,33 @@ function DetectClicks({ position }) {
     },
   });
   return null;
+}
+
+{
+  /* <button onClick={getPosition} className={styles.map}>
+          {isLoadingPosition ? (
+            "Loading"
+          ) : geolocationPosition ? (
+            <MapContainer
+              className={styles.map}
+              center={[geolocationPosition.lat, geolocationPosition.lng]}
+              zoom={13}
+              scrollWheelZoom={true}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker
+                position={[geolocationPosition.lat, geolocationPosition.lng]}
+              >
+                <Popup>
+                  <span>here</span>
+                </Popup>
+              </Marker>
+            </MapContainer>
+          ) : (
+            "here"
+          )}
+        </button> */
 }
