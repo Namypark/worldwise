@@ -18,6 +18,7 @@ function CitiesProvider({ children }) {
           throw new Error(response.Error);
         }
         const data = await response.json();
+        console.log(data);
         setCities(data);
       } catch (error) {
         throw new Error(error);

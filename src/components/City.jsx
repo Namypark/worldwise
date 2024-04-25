@@ -21,6 +21,7 @@ function City() {
   const { getCity, currentCity, isLoading } = useCities();
 
   const navigate = useNavigate();
+
   useEffect(() => {
     getCity(id);
   }, [id, getCity]);

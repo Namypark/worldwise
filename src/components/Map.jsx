@@ -1,11 +1,19 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import useCities from "../contexts/useCities";
 
 export default function Map() {
-  const [position, setPosition] = useState([4.0, 2.3]);
-
+  const [position, setPosition] = useState(null);
+  const { cities } = useCities();
   //Effect to retrieve latitude and longitude from URL and store
   //locally to avoid errors after a refresh is made on the site which resets
 
@@ -20,12 +28,10 @@ export default function Map() {
   };
 
   useEffect(() => {
-    if ((lat, lon)) setPosition([parseFloat(lat), lon]);
-  }, [lat, lon]);
-  useEffect(() => {
-    if (position) {
+    if (lat && lon) {
+      setPosition([parseFloat(lat), parseFloat(lon)]);
     }
-  }, [position]);
+  }, [lat, lon]);
 
   return (
     <button className={styles.mapContainer}>
@@ -39,17 +45,41 @@ export default function Map() {
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Marker position={position}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
+          {cities.map((city) => (
+            <Marker
+              position={[city.position.lat, city.position.lng]}
+              key={city.id}
+            >
+              <Popup>
+                <span>{city.cityName}</span>
+              </Popup>
+            </Marker>
+          ))}
+          <ChangeCenter position={position} />
+          <DetectClicks position={position} />
         </MapContainer>
       ) : (
-        <p>No location</p>
+        <p>hi</p>
       )}
     </button>
   );
+}
+
+function ChangeCenter({ position }) {
+  const map = useMap();
+  map.flyTo(position);
+  return null;
+}
+
+function DetectClicks({ position }) {
+  const navigate = useNavigate();
+  const map = useMapEvents({
+    click(e) {
+      map.flyTo(position);
+      navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`);
+    },
+  });
+  return null;
 }

@@ -49,7 +49,7 @@ CityItem.propTypes = {
       date: PropTypes.string.isRequired,
       notes: PropTypes.string.isRequired,
       position: PropTypes.object,
-      id: PropTypes.string.isRequired,
+      id: PropTypes.string,
     })
   ),
   setCities: PropTypes.func,
