@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 function useGeoLocation(defaultPosition = null) {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +16,7 @@ function useGeoLocation(defaultPosition = null) {
       (pos) => {
         setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setIsLoading(false);
-        console.log(position);
+        console.log(`geolocation position: ${position}`);
       },
       (err) => {
         setError(err.message || err);
@@ -25,8 +25,16 @@ function useGeoLocation(defaultPosition = null) {
       }
     );
   }
+  console.log(position);
 
   return { isLoading, position, error, getPosition };
 }
 
 export default useGeoLocation;
+
+/* <ChangeCenter position={position} />
+          <Marker position={position}>
+            <Popup>
+              <span>you are here</span>
+            </Popup>
+          </Marker> */

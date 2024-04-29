@@ -12,47 +12,47 @@ import {
 import useCities from "../contexts/useCities";
 import useGeoLocation from "../hooks/useGeolocation";
 import Button from "./Button";
+import useUrlPosition from "../hooks/useUrlPosition";
 
 export default function Map() {
-  const [position, setPosition] = useState(null);
+  const [mapPosition, setMapPosition] = useState(null);
   const { cities } = useCities();
   const {
     isLoading: isLoadingPosition,
     position: geolocationPosition,
     error: errorPosition,
-    getPosition: getPosition,
+    getPosition,
   } = useGeoLocation();
-  //Effect to retrieve latitude and longitude from URL and store
+  //Effect to retrieve latitude and lnggitude from URL and store
   //locally to avoid errors after a refresh is made on the site which resets
-
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const lat = searchParams.get("lat");
-  const lon = searchParams.get("lon");
   const navigate = useNavigate();
 
+  const { lat, lng } = useUrlPosition();
+  console.log(`lat and long from urlPosition: ${lat} and ${lng}`);
   const handleNavigate = () => {
     navigate("form");
   };
 
   useEffect(() => {
-    if (lat && lon) {
-      setPosition([parseFloat(lat), parseFloat(lon)]);
+    if (lat && lng) {
+      setMapPosition([parseFloat(lat), parseFloat(lng)]);
+      console.log(`lat and lng from useEffect: ${lat} and ${lng}`);
+      console.log(`mapPosition: ${mapPosition}`);
     }
-  }, [lat, lon]);
+  }, [lat, lng]);
 
   useEffect(() => {
     if (geolocationPosition) {
-      setPosition(geolocationPosition);
+      setMapPosition(geolocationPosition);
     }
   }, [geolocationPosition]);
   return (
-    <button className={styles.mapContainer}>
-      {position ? (
+    <div className={styles.mapContainer}>
+      {mapPosition ? (
         <MapContainer
           className={styles.map}
-          key={`${lat}-${lon}`}
-          center={position}
+          key={`${lat}-${lng}`}
+          center={mapPosition}
           zoom={13}
           scrollWheelZoom={true}
         >
@@ -60,12 +60,15 @@ export default function Map() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <ChangeCenter position={position} />
-          <Marker position={position}>
-            <Popup>
-              <span>you are here</span>
-            </Popup>
-          </Marker>
+          {geolocationPosition && (
+            <Marker position={geolocationPosition}>
+              <Popup>
+                <span>you are here</span>
+              </Popup>
+            </Marker>
+          )}
+          <ChangeCenter mapPosition={geolocationPosition} />
+
           {cities.map((city) => (
             <Marker
               position={[city.position.lat, city.position.lng]}
@@ -76,29 +79,30 @@ export default function Map() {
               </Popup>
             </Marker>
           ))}
-          <ChangeCenter position={position} />
-          <DetectClicks position={position} />
+          <ChangeCenter mapPosition={mapPosition} />
+          <DetectClicks mapPosition={mapPosition} />
         </MapContainer>
       ) : (
         <Button onClick={getPosition} type="position">
           here
         </Button>
       )}
-    </button>
+    </div>
   );
 }
 
-function ChangeCenter({ position }) {
+function ChangeCenter({ mapPosition }) {
   const map = useMap();
-  map.flyTo(position);
+  map.flyTo(mapPosition);
+
   return null;
 }
 
-function DetectClicks({ position }) {
+function DetectClicks({ mapPosition }) {
   const navigate = useNavigate();
   const map = useMapEvents({
     click(e) {
-      map.flyTo(position);
+      map.flyTo(mapPosition);
       navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`);
     },
   });
