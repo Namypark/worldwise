@@ -37,7 +37,6 @@ export default function Map() {
     if (lat && lng) {
       setMapPosition([parseFloat(lat), parseFloat(lng)]);
       console.log(`lat and lng from useEffect: ${lat} and ${lng}`);
-      console.log(`mapPosition: ${mapPosition}`);
     }
   }, [lat, lng]);
 
@@ -67,8 +66,6 @@ export default function Map() {
               </Popup>
             </Marker>
           )}
-          <ChangeCenter mapPosition={geolocationPosition} />
-
           {cities.map((city) => (
             <Marker
               position={[city.position.lat, city.position.lng]}
@@ -81,6 +78,12 @@ export default function Map() {
           ))}
           <ChangeCenter mapPosition={mapPosition} />
           <DetectClicks mapPosition={mapPosition} />
+          <Marker position={mapPosition} key={mapPosition}>
+            <Popup>
+              <span>you just clicked here</span>
+            </Popup>
+          </Marker>
+          ;
         </MapContainer>
       ) : (
         <Button onClick={getPosition} type="position">
@@ -103,6 +106,8 @@ function DetectClicks({ mapPosition }) {
   const map = useMapEvents({
     click(e) {
       map.flyTo(mapPosition);
+      console.log(mapPosition);
+
       navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`);
     },
   });

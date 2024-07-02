@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import styles from "./CityItem.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useCities from "../contexts/useCities";
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
@@ -11,12 +11,18 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 export default function CityItem({ city }) {
-  const { cities, setCities, currentCity } = useCities();
+  const { cities, setCities, currentCity, deleteCity } = useCities();
 
-  const handleDelete = (cityId) => {
-    const updatedCities = cities.filter((city) => city.id !== cityId);
-    setCities(updatedCities);
+  // const handleDelete = (cityId) => {
+  //   const updatedCities = cities.filter((city) => city.id !== cityId);
+  //   setCities(updatedCities);
+  // };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    deleteCity(id);
   };
+
   const { emoji, cityName, date, id, position } = city;
 
   const activeCity = currentCity.id === id;
@@ -32,7 +38,11 @@ export default function CityItem({ city }) {
         <span className={styles.emoji}>{emoji}</span>
         <h3 className={styles.name}>{cityName}</h3>
         <time className={styles.date}>{formatDate(date)}</time>
-        <button onClick={() => handleDelete(id)} className={styles.deleteBtn}>
+        <button
+          // onClick={() => handleDelete(id)}
+          onClick={handleDelete}
+          className={styles.deleteBtn}
+        >
           &times;
         </button>
       </Link>

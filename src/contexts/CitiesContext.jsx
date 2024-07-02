@@ -9,11 +9,13 @@ function CitiesProvider({ children }) {
   const [currentCity, setCurrentCity] = useState({});
 
   const BASE_URL = "http://localhost:3000/";
+  //? useEffect that fetches  cities from the local server and returns and returns an JSON response
   useEffect(() => {
     const fetchCities = async () => {
       setIsLoading(true);
       try {
         const response = await fetch(`${BASE_URL}cities`);
+        console.log(BASE_URL);
         if (!response.ok) {
           throw new Error(response.Error);
         }
@@ -46,6 +48,45 @@ function CitiesProvider({ children }) {
     }
   }, []);
 
+  const createNewCity = async (newCity) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${BASE_URL}cities`, {
+        method: "POST",
+        body: JSON.stringify(newCity),
+        headers: { "content-type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error(response.Error);
+      }
+      const data = await response.json();
+      setCities((cities) => [...cities, data]);
+    } catch (error) {
+      throw new Error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteCity = async (cityId) => {
+    const URL = `${BASE_URL}cities`;
+    const option = {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    };
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${URL}/${cityId}`, option);
+      const data = await response.json();
+      console.log(data);
+      setCities((cities) => cities.filter((c) => c.id !== cityId));
+    } catch (error) {
+      alert("There was no city deleted");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <CitiesContext.Provider
       value={{
@@ -55,6 +96,8 @@ function CitiesProvider({ children }) {
         setIsLoading: setIsLoading,
         currentCity,
         getCity,
+        createNewCity,
+        deleteCity,
       }}
     >
       {children}
